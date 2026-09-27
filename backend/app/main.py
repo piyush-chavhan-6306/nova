@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.exceptions import BaseAppException
-from app.routers import auth, users, hackathons
+from app.routers import auth, users, hackathons, teams
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -51,6 +51,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(hackathons.router, prefix=settings.API_V1_STR)
+app.include_router(teams.router, prefix=settings.API_V1_STR)
 
 
 # Root Health & Status Check

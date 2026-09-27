@@ -13,10 +13,14 @@ class BaseAppException(HTTPException):
 
 
 class NotFoundException(BaseAppException):
-    def __init__(self, resource_name: str, resource_id: Any):
+    def __init__(self, resource_name: str, resource_id: Optional[Any] = None):
+        if resource_id is not None:
+            detail = f"{resource_name} with identifier '{resource_id}' was not found."
+        else:
+            detail = resource_name
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{resource_name} with identifier '{resource_id}' was not found."
+            detail=detail
         )
 
 
