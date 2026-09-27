@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.exceptions import BaseAppException
+from app.routers import auth, users, hackathons
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -36,7 +37,6 @@ async def custom_app_exception_handler(request: Request, exc: BaseAppException):
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
-    # Log unhandled exceptions in production, return clean error response
     if settings.DEBUG:
         detail = str(exc)
     else:
@@ -45,6 +45,12 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": detail},
     )
+
+
+# Register Routers
+app.include_router(auth.router, prefix=settings.API_V1_STR)
+app.include_router(users.router, prefix=settings.API_V1_STR)
+app.include_router(hackathons.router, prefix=settings.API_V1_STR)
 
 
 # Root Health & Status Check

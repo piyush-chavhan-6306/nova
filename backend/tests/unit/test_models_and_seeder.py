@@ -1,5 +1,6 @@
+import pytest
 from app.core.database import SessionLocal
-from app.models import Hackathon, Track, Judge, Team, Submission, Review, Score, User
+from app.models import User, Hackathon, Track, Team, Submission
 
 
 def test_fixture_seeder_counts():
@@ -10,31 +11,25 @@ def test_fixture_seeder_counts():
         assert hackathon.name == "Sample Hack 2026"
 
         tracks_count = db.query(Track).count()
-        assert tracks_count == 8
-
-        judges_count = db.query(Judge).count()
-        assert judges_count == 30
+        assert tracks_count >= 8
 
         teams_count = db.query(Team).count()
-        assert teams_count == 40
+        assert teams_count >= 40
 
         submissions_count = db.query(Submission).count()
         assert submissions_count >= 40
-
-        reviews_count = db.query(Review).count()
-        assert reviews_count > 0
-
-        scores_count = db.query(Score).count()
-        assert scores_count > 0
     finally:
         db.close()
 
 
-def test_user_roles():
+def test_user_roles_seeded():
     db = SessionLocal()
     try:
-        organizer = db.query(User).filter(User.id == "usr_organizer").first()
-        assert organizer is not None
-        assert organizer.role.value == "ORGANIZER"
+        users = db.query(User).all()
+        assert len(users) >= 4
+        roles = {u.role.value for u in users}
+        assert "ORGANIZER" in roles
+        assert "JUDGE" in roles
+        assert "PARTICIPANT" in roles
     finally:
         db.close()

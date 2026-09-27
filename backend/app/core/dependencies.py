@@ -3,6 +3,7 @@ from fastapi import Depends, Header, Request, Cookie
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.exceptions import UnauthorizedException, ForbiddenException
+from app.core.security import decode_access_token
 from app.utils.enums import UserRole
 
 
@@ -61,10 +62,14 @@ def get_current_user_optional(
         info = MOCK_SESSION_REGISTRY[token]
         return UserIdentity(id=info["id"], email=info["email"], role=info["role"], name=info["name"])
 
-    # Fallback lookup in Database (will be active once models exist)
+    # Try JWT decoding
+    payload = decode_access_token(token)
+    user_id = payload.get("sub") if payload else token
+
+    # Database lookup
     try:
         from app.models.user import User
-        user = db.query(User).filter((User.id == token) | (User.email == token)).first()
+        user = db.query(User).filter((User.id == user_id) | (User.email == user_id)).first()
         if user:
             return UserIdentity(id=user.id, email=user.email, role=user.role, name=user.name)
     except Exception:
