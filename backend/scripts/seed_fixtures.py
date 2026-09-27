@@ -46,7 +46,7 @@ def find_fixture_file(explicit_path=None) -> str:
 
 
 def seed_fixtures(db: Session, fixture_path: str):
-    print(f"Loading fixtures from: {fixture_path}")
+    print(f"Loading fixtures into NOVA from: {fixture_path}")
     with open(fixture_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -57,8 +57,8 @@ def seed_fixtures(db: Session, fixture_path: str):
     if not event:
         event = Hackathon(
             id=evt_id,
-            name=evt_data.get("name", "Sample Hack 2026"),
-            description="Official Dogfood Hackathon 2026",
+            name=evt_data.get("name", "NOVA Hackathon 2026"),
+            description="Official NOVA Hackathon 2026",
             submissions_close=parse_iso_datetime(evt_data.get("submissions_close", "2026-03-01T18:00:00Z")),
             status=HackathonStatus.CLOSED  # Submissions closed for fixture testing
         )
@@ -112,7 +112,7 @@ def seed_fixtures(db: Session, fixture_path: str):
         org_user = User(
             id="usr_organizer",
             email="organizer@example.org",
-            name="Organizer Admin",
+            name="NOVA Organizer Admin",
             role=UserRole.ORGANIZER
         )
         db.add(org_user)
@@ -193,7 +193,7 @@ def seed_fixtures(db: Session, fixture_path: str):
 
     db.flush()
 
-    # Create specific Dogfood test Participant user
+    # Create specific test Participant user
     prt_user = db.query(User).filter(User.id == "prt_01").first()
     if not prt_user:
         prt_user = User(
@@ -273,12 +273,7 @@ def seed_fixtures(db: Session, fixture_path: str):
                     db.add(sc_item)
 
     db.commit()
-    print("Database seeding completed successfully!")
-    print("\nTest Logins for .dogfood.toml:")
-    print("  organizer   = \"Cookie: session=org_7f2a\"")
-    print("  judge_a     = \"Cookie: session=jdg_a_91bc\" (Ada Okonkwo / jdg_01)")
-    print("  judge_b     = \"Cookie: session=jdg_b_44de\" (Wei Lindqvist / jdg_02)")
-    print("  participant = \"Cookie: session=prt_2e88\"")
+    print("NOVA database seeding completed successfully!")
 
 
 if __name__ == "__main__":

@@ -3,12 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.exceptions import BaseAppException
-from app.routers import auth, users, hackathons, teams
+from app.routers import (
+    auth, users, hackathons, teams, submissions,
+    gallery, judging, results, registrations, payments, audit
+)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Modular monolith backend for the Dogfood Hackathon Portal, supporting T1 & T2 execution.",
+    description="Modular monolith backend for the NOVA Hackathon Portal, supporting T1 & T2 execution.",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -52,6 +55,14 @@ app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(hackathons.router, prefix=settings.API_V1_STR)
 app.include_router(teams.router, prefix=settings.API_V1_STR)
+app.include_router(submissions.router, prefix=settings.API_V1_STR)
+app.include_router(gallery.router, prefix=settings.API_V1_STR)
+app.include_router(gallery.router)  # Direct root route for /projects compliance
+app.include_router(judging.router, prefix=settings.API_V1_STR)
+app.include_router(results.router, prefix=settings.API_V1_STR)
+app.include_router(registrations.router, prefix=settings.API_V1_STR)
+app.include_router(payments.router, prefix=settings.API_V1_STR)
+app.include_router(audit.router, prefix=settings.API_V1_STR)
 
 
 # Root Health & Status Check

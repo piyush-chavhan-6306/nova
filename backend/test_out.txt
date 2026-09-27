@@ -2,11 +2,15 @@
 platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0
 rootdir: D:\hackathons\dogfood\backend
 plugins: anyio-4.15.1
-collected 14 items
+collected 26 items
 
-tests\unit\test_batch3_api.py .....                                      [ 35%]
-tests\unit\test_batch4_teams.py ....                                     [ 64%]
-tests\unit\test_config.py ...                                            [ 85%]
+tests\unit\test_batch3_api.py .....                                      [ 19%]
+tests\unit\test_batch4_teams.py ....                                     [ 34%]
+tests\unit\test_batch5_submissions.py ....                               [ 50%]
+tests\unit\test_batch6_judging.py ....                                   [ 65%]
+tests\unit\test_batch7_scoring.py ...                                    [ 76%]
+tests\unit\test_batch8_registration_payments_audit.py .                  [ 80%]
+tests\unit\test_config.py ...                                            [ 92%]
 tests\unit\test_models_and_seeder.py ..                                  [100%]
 
 ============================== warnings summary ===============================
@@ -28,14 +32,16 @@ app\core\config.py:17
 
 app\core\config.py:23
   D:\hackathons\dogfood\backend\app\core\config.py:23: PydanticDeprecatedSince20: Using extra keyword arguments on `Field` is deprecated and will be removed. Use `json_schema_extra` instead. (Extra keys: 'env'). Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
-    SECRET_KEY: str = Field(default="dev-secret-key-change-in-production-12345", env="SECRET_KEY")
+    SECRET_KEY: str = Field(default="nova-dev-secret-key-change-in-production-12345", env="SECRET_KEY")
 
-tests/unit/test_batch3_api.py::test_hackathon_and_track_management
-tests/unit/test_batch3_api.py::test_hackathon_and_track_management
-tests/unit/test_batch4_teams.py::test_team_invitation_flow
-tests/unit/test_batch4_teams.py::test_team_invitation_flow
+tests/unit/test_batch3_api.py: 4 warnings
+tests/unit/test_batch4_teams.py: 8 warnings
+tests/unit/test_batch5_submissions.py: 12 warnings
+tests/unit/test_batch6_judging.py: 15 warnings
+tests/unit/test_batch7_scoring.py: 16 warnings
+tests/unit/test_batch8_registration_payments_audit.py: 7 warnings
   D:\hackathons\dogfood\backend\.venv\Lib\site-packages\sqlalchemy\sql\schema.py:4296: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore[call-arg, no-any-return, no-untyped-call]  # noqa: E501
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================= 14 passed, 9 warnings in 1.14s ========================
+======================= 26 passed, 67 warnings in 6.50s =======================

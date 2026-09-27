@@ -8,7 +8,7 @@ def test_fixture_seeder_counts():
     try:
         hackathon = db.query(Hackathon).first()
         assert hackathon is not None
-        assert hackathon.name == "Sample Hack 2026"
+        assert hackathon.name in ["Sample Hack 2026", "NOVA Hackathon 2026"]
 
         tracks_count = db.query(Track).count()
         assert tracks_count >= 8

@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Dogfood Hackathon Portal API"
+    PROJECT_NAME: str = "NOVA Hackathon Portal API"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
@@ -15,12 +15,12 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(
-        default="postgresql+psycopg://postgres:postgres@localhost:5432/dogfood",
+        default="sqlite:///./nova.db",
         env="DATABASE_URL",
     )
 
     # Security
-    SECRET_KEY: str = Field(default="dev-secret-key-change-in-production-12345", env="SECRET_KEY")
+    SECRET_KEY: str = Field(default="nova-dev-secret-key-change-in-production-12345", env="SECRET_KEY")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
