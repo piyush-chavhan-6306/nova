@@ -36,6 +36,8 @@ def find_fixture_file(explicit_path=None) -> str:
         "fixtures (1).json",
         "../dogfood-portal/dogfood/fixtures (1).json",
         "../dogfood-portal/dogfood/fixtures.json",
+        "d:/hackathons/dogfood-NOVA/dogfood-portal/dogfood/fixtures (1).json",
+        "d:/hackathons/dogfood-NOVA/dogfood-portal/dogfood/fixtures.json",
         "d:/hackathons/dogfood/dogfood-portal/dogfood/fixtures (1).json",
         "d:/hackathons/dogfood/dogfood-portal/dogfood/fixtures.json",
     ]
@@ -47,6 +49,8 @@ def find_fixture_file(explicit_path=None) -> str:
 
 def seed_fixtures(db: Session, fixture_path: str):
     print(f"Loading fixtures into NOVA from: {fixture_path}")
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     with open(fixture_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

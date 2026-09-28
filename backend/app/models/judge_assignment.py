@@ -1,7 +1,8 @@
 import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from app.core.database import Base
+from app.utils.enums import AssignmentStatus
 
 
 class JudgeAssignment(Base):
@@ -11,6 +12,9 @@ class JudgeAssignment(Base):
     judge_id = Column(String, ForeignKey("judges.id", ondelete="CASCADE"), nullable=False, index=True)
     submission_id = Column(String, ForeignKey("submissions.id", ondelete="CASCADE"), nullable=False, index=True)
     assigned_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    status = Column(SQLEnum(AssignmentStatus), default=AssignmentStatus.ASSIGNED, nullable=False)
+    completed_at = Column(DateTime, nullable=True)
+    assignment_round = Column(Integer, default=1, nullable=False)
 
     # Relationships
     judge = relationship("Judge", back_populates="assignments")

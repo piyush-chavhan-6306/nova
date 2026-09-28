@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, UserIdentity
+from app.core.dependencies import get_current_user, get_current_user_optional, UserIdentity
 from app.schemas.submission import SubmissionCreate, SubmissionUpdate, SubmissionResponse
 from app.services.submission_service import SubmissionService
 
@@ -35,8 +35,9 @@ def update_submission(
 @router.get("/submissions/{submission_id}", response_model=SubmissionResponse)
 def get_submission(
     submission_id: str,
+    current_user: Optional[UserIdentity] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
-    """Retrieve details of a specific submission."""
+    """Retrieve details of a specific submission with optional blind review masking."""
     service = SubmissionService(db)
-    return service.get_submission(submission_id)
+    return service.get_submission(submission_id, current_user=current_user)

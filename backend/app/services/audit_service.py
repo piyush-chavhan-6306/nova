@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.repositories.audit_repository import AuditRepository
 from app.schemas.audit_log import AuditLogResponse
+from app.core.dependencies import UserIdentity
 
 
 class AuditService:
@@ -9,6 +11,24 @@ class AuditService:
         self.db = db
         self.audit_repo = AuditRepository(db)
 
-    def get_audit_logs(self, hackathon_id: Optional[str] = None, limit: int = 100) -> List[AuditLogResponse]:
-        logs = self.audit_repo.list_logs(hackathon_id=hackathon_id, limit=limit)
+    def get_audit_logs(
+        self,
+        current_user: Optional[UserIdentity] = None,
+        hackathon_id: Optional[str] = None,
+        action: Optional[str] = None,
+        actor_id: Optional[str] = None,
+        entity_type: Optional[str] = None,
+        from_date: Optional[datetime] = None,
+        to_date: Optional[datetime] = None,
+        limit: int = 100
+    ) -> List[AuditLogResponse]:
+        logs = self.audit_repo.list_logs(
+            hackathon_id=hackathon_id,
+            action=action,
+            actor_id=actor_id,
+            entity_type=entity_type,
+            from_date=from_date,
+            to_date=to_date,
+            limit=limit
+        )
         return [AuditLogResponse.model_validate(l) for l in logs]

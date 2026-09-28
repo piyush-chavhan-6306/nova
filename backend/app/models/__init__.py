@@ -18,6 +18,9 @@ from app.models.result import Result
 from app.models.registration import Registration
 from app.models.payment import Payment
 from app.models.audit_log import AuditLog
+from app.models.pairwise_evaluation import PairwiseEvaluation
+from app.models.calibration import CalibrationSet, CalibrationProject, CalibrationResult
+from app.models.judge_conflict import JudgeConflict
 
 __all__ = [
     "Base",
@@ -40,4 +43,9 @@ __all__ = [
     "Registration",
     "Payment",
     "AuditLog",
+    "PairwiseEvaluation",
+    "CalibrationSet",
+    "CalibrationProject",
+    "CalibrationResult",
+    "JudgeConflict",
 ]

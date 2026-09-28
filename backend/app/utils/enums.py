@@ -54,3 +54,19 @@ class PaymentStatus(str, Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     REFUNDED = "REFUNDED"
+
+
+class AssignmentStatus(str, Enum):
+    ASSIGNED = "ASSIGNED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    RECUSED = "RECUSED"
+    CANCELLED = "CANCELLED"
+
+
+class PairwiseStatus(str, Enum):
+    ASSIGNED = "ASSIGNED"
+    IN_PROGRESS = "IN_PROGRESS"
+    SUBMITTED = "SUBMITTED"
+    LOCKED = "LOCKED"
+    CANCELLED = "CANCELLED"

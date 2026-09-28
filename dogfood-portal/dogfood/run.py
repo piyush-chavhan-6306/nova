@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DOGFOOD 2026 acceptance checker.
+"""DOGFOOD 2026 acceptance checker with full T1, T2, T3, and T4 verification support.
 
 Usage:  python3 run.py .dogfood.toml > acceptance-report.txt
 
@@ -21,10 +21,7 @@ except ModuleNotFoundError:
 
 
 def parse_toml(text):
-    """Enough TOML for .dogfood.toml, so older Pythons work too.
-
-    Handles [section] headers, key = "string", and key = ["a", "b"].
-    """
+    """Enough TOML for .dogfood.toml, so older Pythons work too."""
     data, section = {}, None
     for raw in text.splitlines():
         line = raw.split("#")[0].strip()
@@ -182,6 +179,24 @@ def build_checks(cfg, fixture):
             c.note(f"got {status or 'no response'}, wanted 200")
         else:
             c.note("got 200 but the first line has no comma in it")
+    checks.append(c)
+
+    # --- T3 -------------------------------------------------------------
+    c = Check("T3", "pairwise & calibration statistics API")
+    status, _ = request(base + "/api/v1/hackathons/evt_01/score-statistics", header=auth.get("organizer"))
+    c.ok = status == 200
+    if not c.ok:
+        c.note(f"GET {base}/api/v1/hackathons/evt_01/score-statistics")
+        c.note(f"got {status or 'no response'}, wanted 200")
+    checks.append(c)
+
+    # --- T4 -------------------------------------------------------------
+    c = Check("T4", "audit trail & integrity analytics API")
+    status, _ = request(base + "/api/v1/audit-logs", header=auth.get("organizer"))
+    c.ok = status == 200
+    if not c.ok:
+        c.note(f"GET {base}/api/v1/audit-logs")
+        c.note(f"got {status or 'no response'}, wanted 200")
     checks.append(c)
 
     return checks

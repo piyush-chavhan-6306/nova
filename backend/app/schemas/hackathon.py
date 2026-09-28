@@ -18,6 +18,7 @@ class HackathonCreate(BaseModel):
     payment_required: bool = False
     registration_fee: float = 0.0
     currency: str = "USD"
+    blind_review_enabled: bool = False
 
 
 class HackathonUpdate(BaseModel):
@@ -33,6 +34,7 @@ class HackathonUpdate(BaseModel):
     payment_required: Optional[bool] = None
     registration_fee: Optional[float] = None
     currency: Optional[str] = None
+    blind_review_enabled: Optional[bool] = None
 
 
 class HackathonResponse(BaseModel):
@@ -51,6 +53,8 @@ class HackathonResponse(BaseModel):
     payment_required: bool
     registration_fee: float
     currency: str
+    blind_review_enabled: bool = False
+    results_status: str = "DRAFT"
     created_at: datetime
 
 

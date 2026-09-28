@@ -5,10 +5,14 @@ from sqlalchemy.orm import Session, joinedload
 from app.models.submission import Submission
 from app.models.review import Review
 from app.models.score import Score
+from app.models.hackathon import Hackathon
 from app.repositories.result_repository import ResultRepository
 from app.repositories.submission_repository import SubmissionRepository
+from app.repositories.audit_repository import AuditRepository
 from app.schemas.result import ResultResponse, LeaderboardResponse
-from app.utils.enums import ReviewStatus
+from app.utils.enums import ReviewStatus, UserRole
+from app.core.exceptions import ForbiddenException, NotFoundException, BadRequestException
+from app.core.dependencies import UserIdentity
 
 
 class ScoringService:
@@ -16,8 +20,16 @@ class ScoringService:
         self.db = db
         self.result_repo = ResultRepository(db)
         self.sub_repo = SubmissionRepository(db)
+        self.audit_repo = AuditRepository(db)
 
-    def calculate_leaderboard(self, hackathon_id: str) -> LeaderboardResponse:
+    def calculate_leaderboard(self, hackathon_id: str, current_user: Optional[UserIdentity] = None) -> LeaderboardResponse:
+        hack = self.db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
+        if not hack:
+            raise NotFoundException("Hackathon", hackathon_id)
+
+        if hack.results_status == "LOCKED":
+            raise ForbiddenException("Results for this hackathon are locked")
+
         submissions = (
             self.db.query(Submission)
             .options(
@@ -83,16 +95,56 @@ class ScoringService:
             )
             result_responses.append(resp)
 
+        hack.results_status = "CALCULATED"
+        self.db.commit()
+
+        self.audit_repo.log_action(
+            action="RESULT_CALCULATED",
+            user_id=current_user.id if current_user else None,
+            hackathon_id=hackathon_id,
+            target_type="hackathon",
+            target_id=hackathon_id,
+            details="Leaderboard calculated"
+        )
+
         return LeaderboardResponse(
             hackathon_id=hackathon_id,
             total_submissions=len(result_responses),
             results=result_responses
         )
 
+    def transition_result_status(self, hackathon_id: str, new_status: str, current_user: UserIdentity) -> LeaderboardResponse:
+        if current_user.role not in [UserRole.ORGANIZER, UserRole.ADMIN]:
+            raise ForbiddenException("Only organizers or admins can change result status")
+
+        hack = self.db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
+        if not hack:
+            raise NotFoundException("Hackathon", hackathon_id)
+
+        if hack.results_status == "LOCKED" and new_status != "LOCKED":
+            raise ForbiddenException("Results are locked and cannot be modified")
+
+        valid_statuses = ["DRAFT", "CALCULATED", "UNDER_REVIEW", "APPROVED", "PUBLISHED", "LOCKED"]
+        if new_status not in valid_statuses:
+            raise BadRequestException(f"Invalid status {new_status}")
+
+        hack.results_status = new_status
+        self.db.commit()
+
+        self.audit_repo.log_action(
+            action=f"RESULT_{new_status}",
+            user_id=current_user.id,
+            hackathon_id=hackathon_id,
+            target_type="hackathon",
+            target_id=hackathon_id,
+            details=f"Result status transitioned to {new_status}"
+        )
+
+        return self.get_leaderboard(hackathon_id)
+
     def get_leaderboard(self, hackathon_id: str) -> LeaderboardResponse:
         results = self.result_repo.list_results(hackathon_id)
         if not results:
-            # If not yet calculated, calculate now
             return self.calculate_leaderboard(hackathon_id)
 
         responses = []

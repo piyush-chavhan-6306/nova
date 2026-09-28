@@ -6,7 +6,8 @@ from app.repositories.hackathon_repository import HackathonRepository
 from app.repositories.submission_repository import SubmissionRepository
 from app.repositories.team_repository import TeamRepository
 from app.schemas.submission import SubmissionCreate, SubmissionUpdate, SubmissionResponse, GalleryProjectResponse
-from app.utils.enums import SubmissionStatus, HackathonStatus
+from app.utils.enums import SubmissionStatus, HackathonStatus, UserRole
+from app.core.dependencies import UserIdentity
 
 
 class SubmissionService:
@@ -35,11 +36,21 @@ class SubmissionService:
             if now_utc > close_time:
                 raise SubmissionClosedException("Submissions deadline has passed")
 
-    def _build_gallery_response(self, sub) -> GalleryProjectResponse:
+    def _build_gallery_response(self, sub, current_user: Optional[UserIdentity] = None) -> GalleryProjectResponse:
+        hackathon = self.hack_repo.get_by_id(sub.hackathon_id)
+        is_blind = hackathon.blind_review_enabled if hackathon else False
+        is_judge = current_user and current_user.role == UserRole.JUDGE
+
         team_name = sub.team.name if sub.team else None
         track_name = sub.track.name if sub.track else None
         resp = GalleryProjectResponse.model_validate(sub)
-        resp.team_name = team_name
+
+        if is_blind and is_judge:
+            resp.team_id = "ANONYMOUS"
+            resp.team_name = "Anonymous Team"
+        else:
+            resp.team_name = team_name
+
         resp.track_name = track_name
         return resp
 
@@ -74,12 +85,19 @@ class SubmissionService:
         updated = self.sub_repo.update(submission, sub_in)
         return SubmissionResponse.model_validate(updated)
 
-    def get_submission(self, submission_id: str) -> SubmissionResponse:
+    def get_submission(self, submission_id: str, current_user: Optional[UserIdentity] = None) -> SubmissionResponse:
         submission = self.sub_repo.get_by_id(submission_id)
         if not submission:
             raise NotFoundException("Submission", submission_id)
-        return SubmissionResponse.model_validate(submission)
 
-    def list_gallery_projects(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100) -> List[GalleryProjectResponse]:
+        resp = SubmissionResponse.model_validate(submission)
+        hackathon = self.hack_repo.get_by_id(submission.hackathon_id)
+        if hackathon and hackathon.blind_review_enabled:
+            if current_user and current_user.role == UserRole.JUDGE:
+                resp.team_id = "ANONYMOUS"
+
+        return resp
+
+    def list_gallery_projects(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100, current_user: Optional[UserIdentity] = None) -> List[GalleryProjectResponse]:
         submissions = self.sub_repo.list_gallery_submissions(hackathon_id=hackathon_id, skip=skip, limit=limit)
-        return [self._build_gallery_response(s) for s in submissions]
+        return [self._build_gallery_response(s, current_user) for s in submissions]

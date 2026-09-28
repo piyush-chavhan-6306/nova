@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="development", env="ENVIRONMENT")
     DEBUG: bool = Field(default=True, env="DEBUG")
 
-    # Database
+    # Database (PostgreSQL strictly)
     DATABASE_URL: str = Field(
-        default="sqlite:///./nova.db",
+        default="postgresql://postgres:postgres@localhost:5432/nova_db",
         env="DATABASE_URL",
     )
 

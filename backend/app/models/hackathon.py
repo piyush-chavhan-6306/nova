@@ -20,6 +20,8 @@ class Hackathon(Base):
     payment_required = Column(Boolean, default=False, nullable=False)
     registration_fee = Column(Float, default=0.0, nullable=False)
     currency = Column(String, default="USD", nullable=False)
+    blind_review_enabled = Column(Boolean, default=False, nullable=False)
+    results_status = Column(String, default="DRAFT", nullable=False)  # DRAFT, CALCULATED, UNDER_REVIEW, APPROVED, PUBLISHED, LOCKED
     status = Column(SQLEnum(HackathonStatus), default=HackathonStatus.ACTIVE, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 

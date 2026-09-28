@@ -5,13 +5,14 @@ from app.core.config import settings
 from app.core.exceptions import BaseAppException
 from app.routers import (
     auth, users, hackathons, teams, submissions,
-    gallery, judging, results, registrations, payments, audit
+    gallery, judging, results, registrations, payments, audit, pairwise,
+    calibration, score_stats, judge_dashboard, judge_conflict, organizer
 )
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Modular monolith backend for the NOVA Hackathon Portal, supporting T1 & T2 execution.",
+    description="Modular monolith backend for the NOVA Hackathon Portal, supporting T1, T2, T3 & T4 execution.",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -63,6 +64,12 @@ app.include_router(results.router, prefix=settings.API_V1_STR)
 app.include_router(registrations.router, prefix=settings.API_V1_STR)
 app.include_router(payments.router, prefix=settings.API_V1_STR)
 app.include_router(audit.router, prefix=settings.API_V1_STR)
+app.include_router(pairwise.router, prefix=settings.API_V1_STR)
+app.include_router(calibration.router, prefix=settings.API_V1_STR)
+app.include_router(score_stats.router, prefix=settings.API_V1_STR)
+app.include_router(judge_dashboard.router, prefix=settings.API_V1_STR)
+app.include_router(judge_conflict.router, prefix=settings.API_V1_STR)
+app.include_router(organizer.router, prefix=settings.API_V1_STR)
 
 
 # Root Health & Status Check

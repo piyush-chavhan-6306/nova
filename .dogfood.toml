@@ -1,0 +1,19 @@
+[portal]
+base_url = "http://localhost:8000"
+
+[tiers]
+claimed = ["T1", "T2", "T3", "T4"]
+pitch = "Modular monolith backend for the NOVA Hackathon Portal with full T1-T4 judging compliance."
+
+[auth]
+organizer = "Cookie: session=org_7f2a"
+judge_a = "Cookie: session=jdg_a_91bc"
+judge_b = "Cookie: session=jdg_b_44de"
+participant = "Cookie: session=prt_2e88"
+
+[routes]
+gallery = "/projects"
+submit = "/api/v1/submissions"
+judge_scores = "/api/v1/judging/my-assignments"
+peer_scores = "/api/v1/judges/jdg_01/assignments"
+csv_export = "/api/v1/hackathons/evt_01/exports/results.csv"

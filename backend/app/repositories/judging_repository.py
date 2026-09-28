@@ -4,10 +4,11 @@ from typing import List, Optional
 from sqlalchemy.orm import Session, joinedload
 from app.models.judge import Judge
 from app.models.judge_assignment import JudgeAssignment
+from app.models.submission import Submission
 from app.models.review import Review
 from app.models.score import Score
 from app.schemas.judging import ReviewCreate
-from app.utils.enums import ReviewStatus
+from app.utils.enums import ReviewStatus, AssignmentStatus
 
 
 class JudgingRepository:
@@ -23,12 +24,14 @@ class JudgingRepository:
             Judge.hackathon_id == hackathon_id
         ).first()
 
-    def create_assignment(self, judge_id: str, submission_id: str) -> JudgeAssignment:
+    def create_assignment(self, judge_id: str, submission_id: str, assignment_round: int = 1) -> JudgeAssignment:
         assignment_id = f"asgn_{uuid.uuid4().hex[:8]}"
         assignment = JudgeAssignment(
             id=assignment_id,
             judge_id=judge_id,
-            submission_id=submission_id
+            submission_id=submission_id,
+            status=AssignmentStatus.ASSIGNED,
+            assignment_round=assignment_round
         )
         self.db.add(assignment)
         self.db.commit()
@@ -41,11 +44,30 @@ class JudgingRepository:
             JudgeAssignment.submission_id == submission_id
         ).first()
 
+    def get_assignment_by_id(self, assignment_id: str) -> Optional[JudgeAssignment]:
+        return self.db.query(JudgeAssignment).filter(JudgeAssignment.id == assignment_id).first()
+
+    def delete_assignment(self, assignment_id: str) -> bool:
+        asgn = self.get_assignment_by_id(assignment_id)
+        if asgn:
+            self.db.delete(asgn)
+            self.db.commit()
+            return True
+        return False
+
     def list_assignments_for_judge(self, judge_id: str) -> List[JudgeAssignment]:
         return (
             self.db.query(JudgeAssignment)
             .options(joinedload(JudgeAssignment.submission))
             .filter(JudgeAssignment.judge_id == judge_id)
+            .all()
+        )
+
+    def list_assignments_by_hackathon(self, hackathon_id: str) -> List[JudgeAssignment]:
+        return (
+            self.db.query(JudgeAssignment)
+            .join(Submission, JudgeAssignment.submission_id == Submission.id)
+            .filter(Submission.hackathon_id == hackathon_id)
             .all()
         )
 
@@ -72,6 +94,13 @@ class JudgingRepository:
                 comment=s.comment
             )
             self.db.add(score_obj)
+
+        if rev_in.assignment_id:
+            asgn = self.get_assignment_by_id(rev_in.assignment_id)
+            if asgn:
+                asgn.status = AssignmentStatus.COMPLETED
+                asgn.completed_at = datetime.now(timezone.utc)
+                self.db.add(asgn)
 
         self.db.commit()
         self.db.refresh(review)

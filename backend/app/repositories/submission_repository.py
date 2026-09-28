@@ -29,6 +29,14 @@ class SubmissionRepository:
             .first()
         )
 
+    def list_by_hackathon(self, hackathon_id: str) -> List[Submission]:
+        return (
+            self.db.query(Submission)
+            .options(joinedload(Submission.team), joinedload(Submission.track))
+            .filter(Submission.hackathon_id == hackathon_id)
+            .all()
+        )
+
     def create(self, sub_in: SubmissionCreate) -> Submission:
         sub_id = f"sub_{uuid.uuid4().hex[:8]}"
         initial_status = SubmissionStatus.DRAFT if sub_in.is_draft else SubmissionStatus.SUBMITTED

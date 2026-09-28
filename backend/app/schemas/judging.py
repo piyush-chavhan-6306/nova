@@ -1,12 +1,19 @@
 from datetime import datetime
 from typing import Optional, List, Dict
 from pydantic import BaseModel, ConfigDict, Field
-from app.utils.enums import ReviewStatus
+from app.utils.enums import ReviewStatus, AssignmentStatus
 
 
 class JudgeAssignmentCreate(BaseModel):
     submission_id: str
     judge_id: str
+    assignment_round: Optional[int] = 1
+
+
+class BatchJudgeAssignmentCreate(BaseModel):
+    hackathon_id: str
+    target_reviews_per_project: Optional[int] = 2
+    assignment_round: Optional[int] = 1
 
 
 class JudgeAssignmentResponse(BaseModel):
@@ -15,7 +22,10 @@ class JudgeAssignmentResponse(BaseModel):
     id: str
     judge_id: str
     submission_id: str
+    status: AssignmentStatus
     assigned_at: datetime
+    completed_at: Optional[datetime] = None
+    assignment_round: int = 1
 
 
 class ScoreItem(BaseModel):
