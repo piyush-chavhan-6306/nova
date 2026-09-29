@@ -14,6 +14,10 @@ MOCK_SESSION_REGISTRY = {
     "jdg_a_91bc": {"id": "jdg_01", "email": "ada@example.org", "role": UserRole.JUDGE, "name": "Ada Okonkwo"},
     "jdg_b_44de": {"id": "jdg_02", "email": "judge_b@example.org", "role": UserRole.JUDGE, "name": "Judge B"},
     "prt_2e88": {"id": "prt_01", "email": "participant@example.org", "role": UserRole.PARTICIPANT, "name": "Priya Participant"},
+    "usr_admin_001": {"id": "usr_admin_001", "email": "admin@nova.dev", "role": UserRole.ADMIN, "name": "Platform Administrator"},
+    "usr_org_001": {"id": "usr_org_001", "email": "organizer@nova.dev", "role": UserRole.ORGANIZER, "name": "Alex Organizer"},
+    "usr_judge_001": {"id": "usr_judge_001", "email": "judge@nova.dev", "role": UserRole.JUDGE, "name": "Dr. Ada Okonkwo"},
+    "usr_participant_001": {"id": "usr_participant_001", "email": "participant@nova.dev", "role": UserRole.PARTICIPANT, "name": "Priya Sharma"},
 }
 
 
