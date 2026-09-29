@@ -3,6 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 from app.utils.enums import HackathonStatus
 from app.schemas.track import TrackResponse
+from app.schemas.prize import PrizeResponse
 
 
 class HackathonCreate(BaseModel):
@@ -19,6 +20,7 @@ class HackathonCreate(BaseModel):
     registration_fee: float = 0.0
     currency: str = "USD"
     blind_review_enabled: bool = False
+    organizer_id: Optional[str] = None
 
 
 class HackathonUpdate(BaseModel):
@@ -35,6 +37,7 @@ class HackathonUpdate(BaseModel):
     registration_fee: Optional[float] = None
     currency: Optional[str] = None
     blind_review_enabled: Optional[bool] = None
+    organizer_id: Optional[str] = None
 
 
 class HackathonResponse(BaseModel):
@@ -55,8 +58,10 @@ class HackathonResponse(BaseModel):
     currency: str
     blind_review_enabled: bool = False
     results_status: str = "DRAFT"
+    organizer_id: Optional[str] = None
     created_at: datetime
 
 
 class HackathonDetailResponse(HackathonResponse):
     tracks: List[TrackResponse] = []
+    prizes: List[PrizeResponse] = []

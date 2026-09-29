@@ -8,6 +8,8 @@ from app.schemas.judging import (
     JudgeAssignmentCreate, BatchJudgeAssignmentCreate, JudgeAssignmentResponse,
     ReviewCreate, ReviewResponse
 )
+from app.schemas.judge import JudgeCreate, JudgeUpdate, JudgeResponse, JudgeTrackCreate, JudgeTrackResponse
+from app.schemas.rubric import RubricCreate, RubricUpdate, RubricResponse, RubricDetailResponse, RubricCriterionCreate, RubricCriterionUpdate, RubricCriterionResponse
 from app.models.team_member import TeamMember
 from app.models.team import Team
 from app.models.judge import Judge
@@ -168,3 +170,89 @@ class JudgingService:
     def get_reviews_for_submission(self, submission_id: str) -> List[ReviewResponse]:
         reviews = self.judging_repo.get_reviews_for_submission(submission_id)
         return [ReviewResponse.model_validate(r) for r in reviews]
+
+    # --- Judge Management ---
+
+    def list_judges(self, hackathon_id: str) -> List[JudgeResponse]:
+        judges = self.judging_repo.list_judges_for_hackathon(hackathon_id)
+        return [JudgeResponse.model_validate(j) for j in judges]
+
+    def create_judge(self, hackathon_id: str, judge_in: JudgeCreate) -> JudgeResponse:
+        judge = self.judging_repo.create_judge(hackathon_id, judge_in)
+        return JudgeResponse.model_validate(judge)
+
+    def update_judge(self, judge_id: str, judge_in: JudgeUpdate) -> JudgeResponse:
+        judge = self.judging_repo.get_judge_by_id(judge_id)
+        if not judge:
+            raise NotFoundException("Judge", judge_id)
+        updated = self.judging_repo.update_judge(judge, judge_in)
+        return JudgeResponse.model_validate(updated)
+
+    def delete_judge(self, judge_id: str):
+        judge = self.judging_repo.get_judge_by_id(judge_id)
+        if not judge:
+            raise NotFoundException("Judge", judge_id)
+        self.judging_repo.delete_judge(judge)
+
+    def assign_judge_track(self, judge_id: str, track_in: JudgeTrackCreate) -> JudgeTrackResponse:
+        judge = self.judging_repo.get_judge_by_id(judge_id)
+        if not judge:
+            raise NotFoundException("Judge", judge_id)
+        jt = self.judging_repo.assign_judge_track(judge_id, track_in)
+        return JudgeTrackResponse.model_validate(jt)
+
+    def remove_judge_track(self, judge_id: str, track_id: str):
+        success = self.judging_repo.remove_judge_track(judge_id, track_id)
+        if not success:
+            raise NotFoundException("JudgeTrack", f"{judge_id}-{track_id}")
+
+    # --- Rubric Management ---
+
+    def list_rubrics(self, hackathon_id: str) -> List[RubricResponse]:
+        rubrics = self.judging_repo.list_rubrics_for_hackathon(hackathon_id)
+        return [RubricResponse.model_validate(r) for r in rubrics]
+
+    def get_rubric(self, rubric_id: str) -> RubricDetailResponse:
+        rubric = self.judging_repo.get_rubric(rubric_id)
+        if not rubric:
+            raise NotFoundException("Rubric", rubric_id)
+        detail = RubricDetailResponse.model_validate(rubric)
+        detail.criteria = [RubricCriterionResponse.model_validate(c) for c in rubric.criteria]
+        return detail
+
+    def create_rubric(self, hackathon_id: str, rubric_in: RubricCreate) -> RubricResponse:
+        rubric = self.judging_repo.create_rubric(hackathon_id, rubric_in)
+        return RubricResponse.model_validate(rubric)
+    
+    def update_rubric(self, rubric_id: str, rubric_in: RubricUpdate) -> RubricResponse:
+        rubric = self.judging_repo.get_rubric(rubric_id)
+        if not rubric:
+            raise NotFoundException("Rubric", rubric_id)
+        updated = self.judging_repo.update_rubric(rubric, rubric_in)
+        return RubricResponse.model_validate(updated)
+
+    def delete_rubric(self, rubric_id: str):
+        rubric = self.judging_repo.get_rubric(rubric_id)
+        if not rubric:
+            raise NotFoundException("Rubric", rubric_id)
+        self.judging_repo.delete_rubric(rubric)
+    
+    def create_criterion(self, rubric_id: str, crit_in: RubricCriterionCreate) -> RubricCriterionResponse:
+        rubric = self.judging_repo.get_rubric(rubric_id)
+        if not rubric:
+            raise NotFoundException("Rubric", rubric_id)
+        crit = self.judging_repo.create_criterion(rubric_id, crit_in)
+        return RubricCriterionResponse.model_validate(crit)
+
+    def update_criterion(self, criterion_id: str, crit_in: RubricCriterionUpdate) -> RubricCriterionResponse:
+        crit = self.judging_repo.get_criterion(criterion_id)
+        if not crit:
+            raise NotFoundException("RubricCriterion", criterion_id)
+        updated = self.judging_repo.update_criterion(crit, crit_in)
+        return RubricCriterionResponse.model_validate(updated)
+
+    def delete_criterion(self, criterion_id: str):
+        crit = self.judging_repo.get_criterion(criterion_id)
+        if not crit:
+            raise NotFoundException("RubricCriterion", criterion_id)
+        self.judging_repo.delete_criterion(crit)

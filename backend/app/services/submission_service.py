@@ -98,6 +98,6 @@ class SubmissionService:
 
         return resp
 
-    def list_gallery_projects(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100, current_user: Optional[UserIdentity] = None) -> List[GalleryProjectResponse]:
-        submissions = self.sub_repo.list_gallery_submissions(hackathon_id=hackathon_id, skip=skip, limit=limit)
+    def list_gallery_projects(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100, current_user: Optional[UserIdentity] = None, search: Optional[str] = None, track_id: Optional[str] = None) -> List[GalleryProjectResponse]:
+        submissions = self.sub_repo.list_gallery_submissions(hackathon_id=hackathon_id, skip=skip, limit=limit, search=search, track_id=track_id)
         return [self._build_gallery_response(s, current_user) for s in submissions]

@@ -2,6 +2,7 @@ from app.core.database import Base
 from app.models.user import User
 from app.models.hackathon import Hackathon
 from app.models.track import Track
+from app.models.prize import Prize
 from app.models.team import Team
 from app.models.team_member import TeamMember
 from app.models.team_invitation import TeamInvitation
@@ -27,6 +28,7 @@ __all__ = [
     "User",
     "Hackathon",
     "Track",
+    "Prize",
     "Team",
     "TeamMember",
     "TeamInvitation",

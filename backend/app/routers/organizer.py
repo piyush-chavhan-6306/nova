@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, UserIdentity
+from app.core.dependencies import get_current_user, get_current_user_optional, verify_hackathon_owner, UserIdentity
+from app.utils.enums import UserRole
 from app.schemas.organizer_analytics import (
     SubmissionAnalyticsResponse, JudgingAnalyticsResponse,
     TrackAnalyticsItem, IntegrityCheckResponse, OrganizerDashboardResponse
@@ -77,9 +78,12 @@ def get_organizer_dashboard(
 @router.get("/hackathons/{hackathon_id}/exports/results.csv")
 def export_results_csv(
     hackathon_id: str,
+    current_user: Optional[UserIdentity] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
     """Export final leaderboard results as a downloadable CSV."""
+    if current_user and current_user.role == UserRole.ORGANIZER:
+        verify_hackathon_owner(hackathon_id, current_user, db)
     scoring_service = ScoringService(db)
     csv_content = scoring_service.export_csv(hackathon_id)
     return Response(

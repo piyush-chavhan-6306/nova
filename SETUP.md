@@ -46,10 +46,9 @@ VITE_API_URL=http://localhost:8000
 
 ### Option 1: Using Docker Compose (Recommended)
 
-Start all services (PostgreSQL database, Backend FastAPI API):
+Start all services (Frontend Vite, PostgreSQL database, Backend FastAPI API):
 
 ```bash
-cd backend
 docker compose up -d --build
 ```
 
@@ -93,6 +92,7 @@ npm run dev
 
 | Service | URL | Description |
 | :--- | :--- | :--- |
+| **Frontend Portal** | `http://localhost:5173` | React Application (Vite Server) |
 | **Backend REST API** | `http://localhost:8000` | FastAPI root endpoint |
 | **Health Check** | `http://localhost:8000/health` | System & DB connectivity health check |
 | **API Documentation** | `http://localhost:8000/docs` | Interactive Swagger UI (83 API Endpoints) |

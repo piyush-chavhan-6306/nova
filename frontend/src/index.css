@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+:root {
+  --font-sans: 'Google Sans', 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Google Sans', 'Roboto', sans-serif;
+
+  /* Official Google Stitch / Material Design 3 Palette */
+  --google-blue: #1a73e8;
+  --google-blue-hover: #1557b0;
+  --google-blue-light: #e8f0fe;
+  --google-blue-dark: #8ab4f8;
+
+  --google-green: #1e8e3e;
+  --google-green-light: #e6f4ea;
+  --google-green-dark: #81c995;
+
+  --google-yellow: #f9ab00;
+  --google-yellow-light: #fef7e0;
+  --google-yellow-dark: #fde293;
+
+  --google-red: #d93025;
+  --google-red-light: #fce8e6;
+  --google-red-dark: #f28b82;
+
+  --google-purple: #a142f4;
+
+  /* Google Dark Theme Surface Palette */
+  --bg-dark: #202124;
+  --bg-card: #292a2d;
+  --bg-card-hover: #323336;
+  --bg-surface: #303134;
+  --border-subtle: #3c4043;
+  --border-glow: #8ab4f8;
+
+  /* Primary Accent Gradients */
+  --accent-indigo: #8ab4f8;
+  --accent-violet: #c58af9;
+  --accent-cyan: #78d9ec;
+  --accent-emerald: #81c995;
+  --accent-amber: #fde293;
+  --accent-rose: #f28b82;
+
+  --gradient-primary: linear-gradient(135deg, #1a73e8 0%, #4285f4 50%, #1e8e3e 100%);
+  --gradient-card: linear-gradient(180deg, #2d2e31 0%, #252629 100%);
+
+  /* Text Colors */
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-muted: #80868b;
+  --text-disabled: #5f6368;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --navbar-height: 64px;
+}
+
+[data-theme="light"] {
+  --bg-dark: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f3f4;
+  --bg-surface: #f1f3f4;
+  --border-subtle: #dadce0;
+  --border-glow: #1a73e8;
+
+  --accent-indigo: #1a73e8;
+  --accent-violet: #8e24aa;
+  --accent-cyan: #0097a7;
+  --accent-emerald: #1e8e3e;
+  --accent-amber: #e37400;
+  --accent-rose: #d93025;
+
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --text-muted: #80868b;
+  --text-disabled: #bdc1c6;
+}
+
+[data-theme="light"] body {
+  background-color: #f8f9fa;
+  color: #202124;
+}
+
+[data-theme="light"] header {
+  background-color: #ffffff !important;
+  border-bottom-color: #dadce0 !important;
+}
+
+[data-theme="light"] .input-field {
+  background-color: #f1f3f4;
+  border-color: #dadce0;
+  color: #202124;
+}
+
+[data-theme="light"] .input-field:focus {
+  background-color: #ffffff;
+  border-color: #1a73e8;
+}
+
+[data-theme="light"] .btn-secondary {
+  background-color: #f1f3f4;
+  color: #202124;
+  border-color: #dadce0;
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background-color: #e8eaed;
+  border-color: #bdc1c6;
+}
+
+[data-theme="light"] .data-table th {
+  background-color: #f1f3f4;
+  color: #5f6368;
+  border-bottom-color: #dadce0;
+}
+
+[data-theme="light"] .data-table td {
+  border-bottom-color: #e8eaed;
+  color: #202124;
+}
+
+[data-theme="light"] .badge-indigo { background: rgba(26, 115, 232, 0.1); color: #1a73e8; border-color: rgba(26, 115, 232, 0.25); }
+[data-theme="light"] .badge-emerald { background: rgba(30, 142, 62, 0.1); color: #1e8e3e; border-color: rgba(30, 142, 62, 0.25); }
+[data-theme="light"] .badge-amber { background: rgba(227, 116, 0, 0.1); color: #e37400; border-color: rgba(227, 116, 0, 0.25); }
+[data-theme="light"] .badge-rose { background: rgba(217, 48, 37, 0.1); color: #d93025; border-color: rgba(217, 48, 37, 0.25); }
+[data-theme="light"] .badge-cyan { background: rgba(0, 151, 167, 0.1); color: #0097a7; border-color: rgba(0, 151, 167, 0.25); }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(26, 115, 232, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(30, 142, 62, 0.06) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+/* Google Stitch Card Component */
+.glass-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.glass-panel:hover {
+  border-color: #5f6368;
+  background: var(--bg-card-hover);
+}
+
+.glass-panel-glow {
+  position: relative;
+}
+
+.glass-panel-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: var(--google-blue);
+  border-radius: 13px;
+  z-index: -1;
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+}
+
+.glass-panel-glow:hover::after {
+  opacity: 0.3;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #202124;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3c4043;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5f6368;
+}
+
+/* Google Material Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  outline: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--google-blue);
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+}
+
+.btn-primary:hover {
+  background: var(--google-blue-hover);
+  box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.4);
+}
+
+.btn-secondary {
+  background: #303134;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background: #3c4043;
+  border-color: #5f6368;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--google-blue-dark);
+  border: 1px solid var(--google-blue-dark);
+}
+
+.btn-outline:hover {
+  background: rgba(138, 180, 248, 0.08);
+}
+
+.btn-sm {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  border-radius: 16px;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 24px;
+}
+
+/* Form Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: #303134;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--google-blue-dark);
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.25);
+  background: #35363a;
+}
+
+/* Google Stitch Chips & Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.badge-indigo { background: rgba(138, 180, 248, 0.15); color: #8ab4f8; border: 1px solid rgba(138, 180, 248, 0.3); }
+.badge-emerald { background: rgba(129, 201, 149, 0.15); color: #81c995; border: 1px solid rgba(129, 201, 149, 0.3); }
+.badge-amber { background: rgba(253, 226, 147, 0.15); color: #fde293; border: 1px solid rgba(253, 226, 147, 0.3); }
+.badge-rose { background: rgba(242, 139, 130, 0.15); color: #f28b82; border: 1px solid rgba(242, 139, 130, 0.3); }
+.badge-cyan { background: rgba(120, 217, 236, 0.15); color: #78d9ec; border: 1px solid rgba(120, 217, 236, 0.3); }
+
+/* Table Styles */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  background: #303134;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid #3c4043;
+  color: var(--text-primary);
+}
+
+.data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.text-gradient {
+  color: var(--google-blue-dark);
+}

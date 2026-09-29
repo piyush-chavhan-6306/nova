@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, String, Text, DateTime, Integer, Boolean, Float, Enum as SQLEnum
+from sqlalchemy import Column, String, Text, DateTime, Integer, Boolean, Float, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.utils.enums import HackathonStatus
@@ -24,9 +24,12 @@ class Hackathon(Base):
     results_status = Column(String, default="DRAFT", nullable=False)  # DRAFT, CALCULATED, UNDER_REVIEW, APPROVED, PUBLISHED, LOCKED
     status = Column(SQLEnum(HackathonStatus), default=HackathonStatus.ACTIVE, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    organizer_id = Column(String, ForeignKey("users.id"), nullable=True, index=True)
 
     # Relationships
+    organizer = relationship("User", foreign_keys=[organizer_id], back_populates="managed_hackathons")
     tracks = relationship("Track", back_populates="hackathon", cascade="all, delete-orphan")
+    prizes = relationship("Prize", cascade="all, delete-orphan")
     teams = relationship("Team", back_populates="hackathon", cascade="all, delete-orphan")
     submissions = relationship("Submission", back_populates="hackathon", cascade="all, delete-orphan")
     judges = relationship("Judge", back_populates="hackathon", cascade="all, delete-orphan")

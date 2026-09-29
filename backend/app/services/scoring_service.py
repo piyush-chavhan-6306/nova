@@ -12,7 +12,7 @@ from app.repositories.audit_repository import AuditRepository
 from app.schemas.result import ResultResponse, LeaderboardResponse
 from app.utils.enums import ReviewStatus, UserRole
 from app.core.exceptions import ForbiddenException, NotFoundException, BadRequestException
-from app.core.dependencies import UserIdentity
+from app.core.dependencies import UserIdentity, verify_hackathon_owner
 
 
 class ScoringService:
@@ -23,6 +23,9 @@ class ScoringService:
         self.audit_repo = AuditRepository(db)
 
     def calculate_leaderboard(self, hackathon_id: str, current_user: Optional[UserIdentity] = None) -> LeaderboardResponse:
+        if current_user and current_user.role in [UserRole.ORGANIZER, UserRole.ADMIN]:
+            verify_hackathon_owner(hackathon_id, current_user, self.db)
+
         hack = self.db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
         if not hack:
             raise NotFoundException("Hackathon", hackathon_id)
@@ -116,6 +119,7 @@ class ScoringService:
     def transition_result_status(self, hackathon_id: str, new_status: str, current_user: UserIdentity) -> LeaderboardResponse:
         if current_user.role not in [UserRole.ORGANIZER, UserRole.ADMIN]:
             raise ForbiddenException("Only organizers or admins can change result status")
+        verify_hackathon_owner(hackathon_id, current_user, self.db)
 
         hack = self.db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
         if not hack:

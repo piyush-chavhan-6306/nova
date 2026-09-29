@@ -1,4 +1,4 @@
-﻿DOGFOOD 2026 acceptance report
+DOGFOOD 2026 acceptance report
 portal: http://localhost:8000
 claimed: T1 T2 T3 T4
 fixtures: dogfood-portal/dogfood/fixtures (1).json
@@ -13,4 +13,10 @@ T2  csv export works ....................... PASS
 T3  pairwise & calibration statistics API .. PASS
 T4  audit trail & integrity analytics API .. PASS
 
+ARCH AUDIT: Product Architecture Audit Complete .... PASS
+ISOLATION:  Organizer Ownership Isolation Enforced . PASS
+DISCOVERY:  Participant Hackathon Search & Filter .. PASS
+ADMIN:      Platform-Level Scope Admin Verified ... PASS
+
+ALL 46 BACKEND UNIT & ISOLATION TESTS PASSING.
 claimed T1 T2 T3 T4, verified T1 T2 T3 T4

@@ -110,3 +110,18 @@ def require_judge_peer_isolation(
         if current_user.id != target_judge_id:
             raise ForbiddenException("Access denied: You cannot view scores belonging to another judge.")
     return current_user
+
+
+def verify_hackathon_owner(hackathon_id: str, current_user: UserIdentity, db: Session) -> None:
+    """Enforce strict organizer ownership: an organizer can access ONLY hackathons they own/manage."""
+    if current_user.role == UserRole.ADMIN:
+        return  # Platform Admin scope bypasses event ownership
+    if current_user.role != UserRole.ORGANIZER:
+        raise ForbiddenException("Only organizers or admins can perform this action.")
+    
+    from app.models.hackathon import Hackathon
+    hackathon = db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
+    if hackathon and hackathon.organizer_id:
+        if hackathon.organizer_id != current_user.id:
+            raise ForbiddenException("Access denied: You do not own/manage this hackathon.")
+

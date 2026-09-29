@@ -1,7 +1,7 @@
 import csv
 import io
 import statistics
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.models.hackathon import Hackathon
 from app.models.submission import Submission
@@ -21,19 +21,21 @@ from app.schemas.organizer_analytics import (
 )
 from app.utils.enums import SubmissionStatus, ReviewStatus, UserRole
 from app.core.exceptions import ForbiddenException, NotFoundException
-from app.core.dependencies import UserIdentity
+from app.core.dependencies import UserIdentity, verify_hackathon_owner
 
 
 class OrganizerService:
     def __init__(self, db: Session):
         self.db = db
 
-    def _verify_organizer(self, current_user: UserIdentity):
+    def _verify_organizer(self, current_user: UserIdentity, hackathon_id: Optional[str] = None):
         if current_user.role not in [UserRole.ORGANIZER, UserRole.ADMIN]:
             raise ForbiddenException("Only organizers or admins can access these endpoints")
+        if hackathon_id:
+            verify_hackathon_owner(hackathon_id, current_user, self.db)
 
     def get_submission_analytics(self, hackathon_id: str, current_user: UserIdentity) -> SubmissionAnalyticsResponse:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         subs = self.db.query(Submission).filter(Submission.hackathon_id == hackathon_id).all()
         total = len(subs)
@@ -65,7 +67,7 @@ class OrganizerService:
         )
 
     def get_judging_analytics(self, hackathon_id: str, current_user: UserIdentity) -> JudgingAnalyticsResponse:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         reviews = (
             self.db.query(Review)
@@ -118,7 +120,7 @@ class OrganizerService:
         )
 
     def get_track_analytics(self, hackathon_id: str, current_user: UserIdentity) -> List[TrackAnalyticsItem]:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         tracks = self.db.query(Track).filter(Track.hackathon_id == hackathon_id).all()
         result = []
@@ -147,7 +149,7 @@ class OrganizerService:
         return result
 
     def run_integrity_checks(self, hackathon_id: str, current_user: UserIdentity) -> IntegrityCheckResponse:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         alerts: List[IntegrityAlertItem] = []
 
@@ -208,7 +210,7 @@ class OrganizerService:
         )
 
     def get_organizer_dashboard(self, hackathon_id: str, current_user: UserIdentity) -> OrganizerDashboardResponse:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         hack = self.db.query(Hackathon).filter(Hackathon.id == hackathon_id).first()
         if not hack:
@@ -244,7 +246,7 @@ class OrganizerService:
 
     # Advanced Exports
     def export_judging_csv(self, hackathon_id: str, current_user: UserIdentity) -> str:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         reviews = (
             self.db.query(Review)
@@ -263,7 +265,7 @@ class OrganizerService:
         return output.getvalue()
 
     def export_judges_csv(self, hackathon_id: str, current_user: UserIdentity) -> str:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         judges = self.db.query(Judge).filter(Judge.hackathon_id == hackathon_id).all()
         output = io.StringIO()
@@ -283,7 +285,7 @@ class OrganizerService:
         return output.getvalue()
 
     def export_audit_csv(self, hackathon_id: str, current_user: UserIdentity) -> str:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         logs = self.db.query(AuditLog).filter(AuditLog.hackathon_id == hackathon_id).all()
         output = io.StringIO()
@@ -296,7 +298,7 @@ class OrganizerService:
         return output.getvalue()
 
     def export_integrity_csv(self, hackathon_id: str, current_user: UserIdentity) -> str:
-        self._verify_organizer(current_user)
+        self._verify_organizer(current_user, hackathon_id)
 
         checks = self.run_integrity_checks(hackathon_id, current_user)
         output = io.StringIO()

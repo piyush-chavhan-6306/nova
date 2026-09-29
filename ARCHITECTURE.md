@@ -1,18 +1,19 @@
 # 🏛️ ARCHITECTURE.md — System Architecture & Design Rationale
 
 ## 1. Overview
-The **NOVA Hackathon Portal** is designed as a clean, production-grade **Modular Monolith** powered by **FastAPI** (Python 3.12) and **PostgreSQL**. It provides full compliance with the DOGFOOD 2026 specification, supporting end-to-end hackathon lifecycle management, multi-criteria scoring rubrics, pairwise evaluation, judge calibration, peer isolation, conflict recusal workflows, and result state machines.
+The **NOVA Hackathon Portal** is designed as a fully integrated **React/Vite Frontend** backed by a **FastAPI Modular Monolith** (Python 3.12) and **PostgreSQL**. It provides full compliance with the DOGFOOD 2026 specification, supporting end-to-end hackathon lifecycle management, multi-criteria scoring rubrics, pairwise evaluation, judge calibration, peer isolation, conflict recusal workflows, and result state machines.
 
 ---
 
 ## 2. Architectural Layers
 
 ```
-                               ┌───────────────────────────┐
-                               │   Client / Runner / UI    │
-                               └─────────────┬─────────────┘
-                                             │ HTTP / REST
-                                             ▼
+                                ┌───────────────────────────┐
+                                │    React Frontend UI      │
+                                │    (Vite, TypeScript)     │
+                                └─────────────┬─────────────┘
+                                              │ HTTP / REST
+                                              ▼
                                ┌───────────────────────────┐
                                │      FastAPI Routers      │
                                │  (RBAC & Auth Middleware) │

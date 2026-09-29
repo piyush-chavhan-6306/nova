@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, UserIdentity
+from app.core.dependencies import get_current_user, get_current_user_optional, verify_hackathon_owner, UserIdentity
+from app.utils.enums import UserRole
 from app.schemas.team import (
     TeamCreate, TeamResponse, TeamInvitationCreate,
     TeamInvitationResponse, TeamInvitationAction
@@ -31,8 +32,14 @@ def get_team(team_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/hackathons/{hackathon_id}/teams", response_model=List[TeamResponse])
-def list_teams_for_hackathon(hackathon_id: str, db: Session = Depends(get_db)):
+def list_teams_for_hackathon(
+    hackathon_id: str,
+    current_user: Optional[UserIdentity] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
+):
     """List all registered teams for a hackathon."""
+    if current_user and current_user.role == UserRole.ORGANIZER:
+        verify_hackathon_owner(hackathon_id, current_user, db)
     service = TeamService(db)
     return service.list_teams_for_hackathon(hackathon_id)
 

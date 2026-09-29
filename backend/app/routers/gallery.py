@@ -14,6 +14,8 @@ def get_public_gallery(
     hackathon_id: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
+    search: Optional[str] = Query(None),
+    track_id: Optional[str] = Query(None),
     db: Session = Depends(get_db)
 ):
     """
@@ -21,4 +23,4 @@ def get_public_gallery(
     No authentication required. Returns published hackathon project submissions.
     """
     service = SubmissionService(db)
-    return service.list_gallery_projects(hackathon_id=hackathon_id, skip=skip, limit=limit)
+    return service.list_gallery_projects(hackathon_id=hackathon_id, skip=skip, limit=limit, search=search, track_id=track_id)

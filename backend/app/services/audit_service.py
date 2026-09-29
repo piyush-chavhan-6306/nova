@@ -3,7 +3,9 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.repositories.audit_repository import AuditRepository
 from app.schemas.audit_log import AuditLogResponse
-from app.core.dependencies import UserIdentity
+from app.core.dependencies import UserIdentity, verify_hackathon_owner
+from app.core.exceptions import ForbiddenException
+from app.utils.enums import UserRole
 
 
 class AuditService:
@@ -22,6 +24,10 @@ class AuditService:
         to_date: Optional[datetime] = None,
         limit: int = 100
     ) -> List[AuditLogResponse]:
+        if current_user and current_user.role == UserRole.ORGANIZER:
+            if hackathon_id:
+                verify_hackathon_owner(hackathon_id, current_user, self.db)
+
         logs = self.audit_repo.list_logs(
             hackathon_id=hackathon_id,
             action=action,

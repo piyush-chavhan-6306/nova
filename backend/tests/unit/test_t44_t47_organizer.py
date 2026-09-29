@@ -16,17 +16,16 @@ def setup_t44_fixtures():
 
     uid = uuid.uuid4().hex[:6]
     hack_id = f"hack_t44_{uid}"
-    hack = Hackathon(id=hack_id, name="T44 Organizer Hackathon", status=HackathonStatus.ACTIVE)
+    org_user_id = f"usr_t44_org_{uid}"
+    org_user = User(id=org_user_id, email=f"org_{uid}@example.com", name="Org T44", role=UserRole.ORGANIZER, hashed_password=get_password_hash("password"))
+    db.add(org_user)
+
+    hack = Hackathon(id=hack_id, name="T44 Organizer Hackathon", status=HackathonStatus.ACTIVE, organizer_id=org_user_id)
     db.add(hack)
 
     # Submissions
     sub1 = Submission(id=f"sub_t44_1_{uid}", hackathon_id=hack_id, team_id=f"tm1_{uid}", title="Project 1", status=SubmissionStatus.SUBMITTED)
     db.add(sub1)
-
-    # Organizer User
-    org_user_id = f"usr_t44_org_{uid}"
-    org_user = User(id=org_user_id, email=f"org_{uid}@example.com", name="Org T44", role=UserRole.ORGANIZER, hashed_password=get_password_hash("password"))
-    db.add(org_user)
 
     db.commit()
     db.close()

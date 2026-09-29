@@ -20,3 +20,4 @@ class User(Base):
     team_memberships = relationship("TeamMember", back_populates="user", cascade="all, delete-orphan")
     judge_profile = relationship("Judge", back_populates="user", uselist=False, cascade="all, delete-orphan")
     registrations = relationship("Registration", back_populates="user", cascade="all, delete-orphan")
+    managed_hackathons = relationship("Hackathon", foreign_keys="[Hackathon.organizer_id]", back_populates="organizer")

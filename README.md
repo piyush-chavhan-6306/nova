@@ -8,9 +8,10 @@ NOVA is a modular monolith backend implementation built for the **DOGFOOD 2026**
 
 - **Project Name**: NOVA Hackathon Portal (`dogfood-NOVA`)
 - **Backend Framework**: FastAPI (Python 3.12)
+- **Frontend Framework**: React 18, Vite, TypeScript
 - **Database Engine**: PostgreSQL 15+ (SQLAlchemy ORM + `psycopg2-binary`)
 - **API Protocol**: RESTful API under `/api/v1` namespace (83 Endpoints)
-- **Containerization**: Docker & Docker Compose (`docker compose up -d --build`)
+- **Containerization**: Docker & Docker Compose (`docker compose up --build`)
 - **Testing & Verification**: 37 Pytest unit tests + DOGFOOD acceptance checker (`run.py`)
 
 ---
@@ -41,17 +42,26 @@ claimed T1 T2 T3 T4, verified T1 T2 T3 T4
 ## 🚀 Quick Start & Installation
 
 ### Option 1: Docker Compose (Recommended)
+This runs the complete stack: Frontend (Vite), Backend (FastAPI), and Database (Postgres).
 ```bash
-cd backend
-docker compose up -d --build
+docker compose up --build
 ```
+- Frontend UI: http://localhost:5173
+- Backend API Docs: http://localhost:8000/docs
 
-### Option 2: Native Python Setup
+### Option 2: Local Development
+**Backend Setup**
 ```bash
 cd backend
 pip install -r requirements.txt
-python scripts/seed_fixtures.py
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Frontend Setup**
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
@@ -61,3 +71,5 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 - [ARCHITECTURE.md](ARCHITECTURE.md): System design, modular monolith pattern, & security guards
 - [DATA-MODEL.md](DATA-MODEL.md): PostgreSQL schema & entity relationships
 - [JUDGING.md](JUDGING.md): Rubrics, Pairwise, Calibration, Outliers, & State Machine specs
+- [INTEGRATION_GAPS.md](INTEGRATION_GAPS.md): Missing API details to support UI
+- [HACKATHON_CONTENT_GAPS.md](HACKATHON_CONTENT_GAPS.md): Documented frontend UI features that are pending backend support

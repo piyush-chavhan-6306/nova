@@ -14,6 +14,7 @@ from app.models import (
     Review, Score
 )
 from app.utils.enums import UserRole, HackathonStatus, TeamRole, SubmissionStatus, ReviewStatus
+from app.core.security import get_password_hash
 
 
 def parse_iso_datetime(dt_str: str) -> datetime:
@@ -54,6 +55,18 @@ def seed_fixtures(db: Session, fixture_path: str):
     with open(fixture_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    # Create special test Organizer user first so FK is valid
+    org_user = db.query(User).filter(User.id == "usr_organizer").first()
+    if not org_user:
+        org_user = User(
+            id="usr_organizer",
+            email="organizer@example.org",
+            name="NOVA Organizer Admin",
+            role=UserRole.ORGANIZER
+        )
+        db.add(org_user)
+        db.flush()
+
     # 1. Event / Hackathon
     evt_data = data.get("event", {})
     evt_id = evt_data.get("id", "evt_01")
@@ -64,12 +77,14 @@ def seed_fixtures(db: Session, fixture_path: str):
             name=evt_data.get("name", "NOVA Hackathon 2026"),
             description="Official NOVA Hackathon 2026",
             submissions_close=parse_iso_datetime(evt_data.get("submissions_close", "2026-03-01T18:00:00Z")),
-            status=HackathonStatus.CLOSED  # Submissions closed for fixture testing
+            status=HackathonStatus.CLOSED,  # Submissions closed for fixture testing
+            organizer_id="usr_organizer"
         )
         db.add(event)
     else:
         event.name = evt_data.get("name", event.name)
         event.submissions_close = parse_iso_datetime(evt_data.get("submissions_close", "2026-03-01T18:00:00Z"))
+        event.organizer_id = "usr_organizer"
     db.flush()
 
     # 2. Tracks
@@ -275,6 +290,36 @@ def seed_fixtures(db: Session, fixture_path: str):
                         score=float(val)
                     )
                     db.add(sc_item)
+
+    # 8. Seed Demo Accounts for Frontend UI Login
+    demo_data = [
+        ("usr_admin_001", "admin@nova.dev", "Platform Administrator", UserRole.ADMIN, "nova2026!"),
+        ("usr_org_001", "organizer@nova.dev", "Alex Organizer", UserRole.ORGANIZER, "nova2026!"),
+        ("usr_judge_001", "judge@nova.dev", "Dr. Ada Okonkwo", UserRole.JUDGE, "nova2026!"),
+        ("usr_participant_001", "participant@nova.dev", "Priya Sharma", UserRole.PARTICIPANT, "nova2026!"),
+    ]
+    for uid, email, name, role, password in demo_data:
+        existing = db.query(User).filter(User.email == email).first()
+        if not existing:
+            u_demo = User(
+                id=uid,
+                email=email,
+                name=name,
+                role=role,
+                hashed_password=get_password_hash(password)
+            )
+            db.add(u_demo)
+        else:
+            existing.hashed_password = get_password_hash(password)
+            existing.name = name
+            existing.role = role
+
+    # Also set default password for all existing seeded users
+    all_users = db.query(User).all()
+    default_hash = get_password_hash("nova2026!")
+    for u in all_users:
+        if not u.hashed_password:
+            u.hashed_password = default_hash
 
     db.commit()
     print("NOVA database seeding completed successfully!")

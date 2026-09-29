@@ -79,7 +79,7 @@ class SubmissionRepository:
         self.db.refresh(submission)
         return self.get_by_id(submission.id)
 
-    def list_gallery_submissions(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100) -> List[Submission]:
+    def list_gallery_submissions(self, hackathon_id: Optional[str] = None, skip: int = 0, limit: int = 100, search: Optional[str] = None, track_id: Optional[str] = None) -> List[Submission]:
         query = (
             self.db.query(Submission)
             .options(joinedload(Submission.team), joinedload(Submission.track))
@@ -87,4 +87,8 @@ class SubmissionRepository:
         )
         if hackathon_id:
             query = query.filter(Submission.hackathon_id == hackathon_id)
+        if track_id:
+            query = query.filter(Submission.track_id == track_id)
+        if search:
+            query = query.filter(Submission.title.ilike(f"%{search}%"))
         return query.offset(skip).limit(limit).all()
